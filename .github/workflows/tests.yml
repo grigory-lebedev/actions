@@ -31,6 +31,8 @@ jobs:
           node-version: 14.x
       - name: install dependencies
         run: npm install
+      - name: build application
+        run: npm run build
       - name: deploy to netlify
         uses: netlify/actions/cli@master
         env:
