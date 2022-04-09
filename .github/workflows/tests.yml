@@ -33,11 +33,9 @@ jobs:
         run: npm install
       - name: build application
         run: npm run build
-      - name: deploy to netlify
-        uses: netlify/actions/cli@master
-        env:
-          NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
-          NETLIFY_SITE_ID: ${{ secrets.DEV_NETLIFY_SITE_ID }}
+      - name: deploy to Firebase
+        uses: w9jds/firebase-action@master
         with:
-          args: deploy --dir=dist --prod --force
-          secrets: '["NETLIFY_AUTH_TOKEN", "DEV_NETLIFY_SITE_ID"]'
+          args: deploy --only hosting
+        env:
+          FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
