@@ -6,7 +6,7 @@ on:
       - develop
 
 jobs:
-  super-test:
+  unit-tests:
     name: run unit tests
     runs-on: ubuntu-latest
     steps:
@@ -18,3 +18,24 @@ jobs:
         run: npm install
       - name: run tests
         run: npm run test
+
+
+  dev-deploy:
+    name: deploy to dev
+    runs-on: ubuntu-latest
+    needs: unit-tests
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v1
+        with:
+          node-version: 14.x
+      - name: install dependencies
+        run: npm install
+      - name: deploy to netlify
+        uses: netlify/actions/cli@master
+        env:
+          NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
+          NETLIFY_SITE_ID: ${{ secrets.DEV_NETLIFY_SITE_ID }}
+        with:
+          args: deploy --dir=dist
+          secrets: '["NETLIFY_AUTH_TOKEN", "DEV_NETLIFY_SITE_ID"]
