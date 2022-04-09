@@ -1,0 +1,20 @@
+name: super-tests
+
+on: 
+  push:
+    branches:
+      - develop
+
+jobs:
+  super-test:
+    name: run unit tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v1
+        with:
+          node-version: 14.x
+      - name: install dependencies
+        run: npm install
+      - name: run tests
+        run: npm run test
