@@ -34,7 +34,11 @@ jobs:
       - name: build application
         run: npm run build
       - name: choose dev environment
-        run: firebase use default
+        uses: w9jds/firebase-action@master
+        with:
+          args: use default
+        env:
+          FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
       - name: deploy to Firebase
         uses: w9jds/firebase-action@master
         with:
