@@ -55,8 +55,10 @@ jobs:
     environment: 'merge approve'
     steps:
       - uses: actions/checkout@v2
-      - name: 'Merging into master'
-        run: |
-          git checkout master
-          git merge develop
+      - uses: devmasx/merge-branch@master
+        with:
+          type: now
+          from_branch: develop
+          target_branch: master
+          github_token: ${{ github.token }}
 
