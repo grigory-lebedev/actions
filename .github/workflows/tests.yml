@@ -1,0 +1,111 @@
+name: push-dev
+
+on: 
+  push:
+    branches:
+      - develop
+
+jobs:
+  dev-tests:
+    name: run unit tests on dev
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v1
+        with:
+          node-version: 14.x
+      - name: install dependencies
+        run: npm install
+      - name: run tests
+        run: npm run test
+
+
+  dev-deploy:
+    name: deploy to dev
+    runs-on: ubuntu-latest
+    needs: dev-tests
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v1
+        with:
+          node-version: 14.x
+      - name: install dependencies
+        run: npm install
+      - name: build application
+        run: npm run build
+      - name: select dev environment
+        uses: w9jds/firebase-action@master
+        with:
+          args: use default
+        env:
+          FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
+      - name: deploy to Firebase
+        uses: w9jds/firebase-action@master
+        with:
+          args: deploy --only hosting
+        env:
+          FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
+
+
+
+  merging-to-master:
+    name: merge to master
+    runs-on: ubuntu-latest
+    needs: dev-deploy
+    environment: 'merge approve'
+    steps:
+      - uses: actions/checkout@v2
+      - uses: devmasx/merge-branch@master
+        with:
+          type: now
+          from_branch: develop
+          target_branch: master
+          github_token: ${{ github.token }}
+
+  master-tests:
+    name: run unit tests on master
+    runs-on: ubuntu-latest
+    needs: merging-to-master
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          ref: master
+      - uses: actions/setup-node@v1
+        with:
+          node-version: 14.x
+      - name: install dependencies
+        run: npm install
+      - name: run tests
+        run: npm run test
+        
+  prod-deploy:
+    name: deploy to production
+    runs-on: ubuntu-latest
+    needs: master-tests
+    environment: 'prod deploy'
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          ref: master
+      - uses: actions/setup-node@v1
+        with:
+          node-version: 14.x
+      - name: install dependencies
+        run: npm install
+      - name: build application
+        run: npm run build
+      - name: select prod environment
+        uses: w9jds/firebase-action@master
+        with:
+          args: use prod
+        env:
+          FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
+      - name: deploy to Firebase
+        uses: w9jds/firebase-action@master
+        with:
+          args: deploy --only hosting
+        env:
+          FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
+
+
+

@@ -1,0 +1,7 @@
+{
+  "projects": {
+    "default": "actions-dev-618b4",
+    "prod": "actions-prod"
+  },
+  "targets": {}
+}
