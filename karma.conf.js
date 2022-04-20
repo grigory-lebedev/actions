@@ -42,3 +42,7 @@ module.exports = function (config) {
     restartOnFileChange: true
   });
 };
+
+process.on('infrastructure_error', (error) => {
+  console.error('infrastructure_error', error);
+});
